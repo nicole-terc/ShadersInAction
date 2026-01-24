@@ -8,14 +8,11 @@ object SimpleShaders {
     private val green = RuntimeShader(GREEN)
     private val blue = RuntimeShader(BLUE)
 
-    val shaderMap = mapOf(
+    fun getShaderMap() = mapOf(
         "red" to red,
         "green" to green,
         "blue" to blue,
     )
-
-    val shadersNames = shaderMap.keys.toList()
-    val shadersList = shaderMap.values.toList()
 }
 
 const val RED = """
