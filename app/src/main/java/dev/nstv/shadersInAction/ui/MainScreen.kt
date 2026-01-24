@@ -1,7 +1,6 @@
 package dev.nstv.shadersInAction.ui
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -28,14 +27,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import dev.nstv.shadersInAction.R
-import dev.nstv.shadersInAction.ui.screens.ScreenA
+import dev.nstv.shadersInAction.ui.screens.TextScreen
 import dev.nstv.shadersInAction.ui.screens.ScreenB
 import dev.nstv.shadersInAction.ui.theme.Grid
 import kotlinx.coroutines.launch
 
+// Start Config
+const val HideOptions = false
+const val Sheep = false
+// End Config
 
 enum class DrawerDestination(val title: String) {
-    ScreenA("Screen A"),
+    TextScreen("Text Screen"),
     ScreenB("Screen B"),
 
 }
@@ -45,11 +48,11 @@ enum class DrawerDestination(val title: String) {
 fun MainScreen(
     modifier: Modifier = Modifier,
 ) {
-    val backStack = remember { listOf<Any>(DrawerDestination.ScreenA).toMutableStateList() }
+    val backStack = remember { listOf<Any>(DrawerDestination.TextScreen).toMutableStateList() }
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val currentDestination = backStack.lastOrNull() as? DrawerDestination
-        ?: DrawerDestination.ScreenA
+        ?: DrawerDestination.TextScreen
 
     ModalNavigationDrawer(
         modifier = modifier,
@@ -86,7 +89,7 @@ fun MainScreen(
                 backStack = backStack,
                 onBack = { backStack.popLast() },
                 entryProvider = entryProvider {
-                    entry(DrawerDestination.ScreenA) { ScreenA(padding) }
+                    entry(DrawerDestination.TextScreen) { TextScreen(padding) }
                     entry(DrawerDestination.ScreenB) { ScreenB(padding) }
                 }
             )
