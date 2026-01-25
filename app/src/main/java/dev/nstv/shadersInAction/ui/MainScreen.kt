@@ -27,8 +27,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import dev.nstv.shadersInAction.R
-import dev.nstv.shadersInAction.ui.screens.TextScreen
 import dev.nstv.shadersInAction.ui.screens.ScreenB
+import dev.nstv.shadersInAction.ui.screens.TextScreen
 import dev.nstv.shadersInAction.ui.theme.Grid
 import kotlinx.coroutines.launch
 
@@ -86,11 +86,14 @@ fun MainScreen(
             },
         ) { padding ->
             NavDisplay(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding),
                 backStack = backStack,
                 onBack = { backStack.popLast() },
                 entryProvider = entryProvider {
-                    entry(DrawerDestination.TextScreen) { TextScreen(padding) }
-                    entry(DrawerDestination.ScreenB) { ScreenB(padding) }
+                    entry(DrawerDestination.TextScreen) { TextScreen() }
+                    entry(DrawerDestination.ScreenB) { ScreenB() }
                 }
             )
         }

@@ -9,10 +9,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 
 @Composable
-fun ScreenB(padding: PaddingValues) {
-    Box(Modifier.fillMaxSize().padding(padding)) {
+fun ScreenB(modifier: Modifier = Modifier) {
+    Box(modifier) {
         Text(
             text = "Screen B",
             style = MaterialTheme.typography.headlineLarge,
