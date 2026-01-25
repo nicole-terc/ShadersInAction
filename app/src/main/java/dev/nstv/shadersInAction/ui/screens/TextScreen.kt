@@ -22,6 +22,7 @@ fun TextScreen(
                 .align(Alignment.Center)
                 .graphicsLayer {
                     clip = true
+                    shader.setFloatUniform("size", floatArrayOf(size.width, size.height))
                     renderEffect = RenderEffect.createRuntimeShaderEffect(shader, "composable")
                         .asComposeRenderEffect()
                 }

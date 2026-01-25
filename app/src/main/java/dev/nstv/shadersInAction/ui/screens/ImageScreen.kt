@@ -8,6 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asComposeRenderEffect
 import androidx.compose.ui.graphics.graphicsLayer
@@ -25,8 +26,10 @@ fun ImageScreen(modifier: Modifier = Modifier) {
             modifier = Modifier
                 .graphicsLayer {
                     clip = true
-                    renderEffect = RenderEffect.createRuntimeShaderEffect(shader, "composable")
-                        .asComposeRenderEffect()
+                    shader.setFloatUniform("size", floatArrayOf(size.width, size.height))
+                    renderEffect =
+                        RenderEffect.createRuntimeShaderEffect(shader, "composable")
+                            .asComposeRenderEffect()
                 }
         )
     }
