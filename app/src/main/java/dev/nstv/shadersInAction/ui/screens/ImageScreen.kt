@@ -1,25 +1,28 @@
 package dev.nstv.shadersInAction.ui.screens
 
 import android.graphics.RenderEffect
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asComposeRenderEffect
 import androidx.compose.ui.graphics.graphicsLayer
-
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.imageResource
+import dev.nstv.shadersInAction.R
 
 @Composable
-fun TextScreen(
-    modifier: Modifier = Modifier
-) {
+fun ImageScreen(modifier: Modifier = Modifier) {
     ShadersWrapper(modifier) { shader ->
-        Text(
-            text = "Screen A",
-            style = MaterialTheme.typography.headlineLarge,
+        Image(
+            bitmap = ImageBitmap.imageResource(R.drawable.sheep),
+            contentDescription = "Sheep",
+            contentScale = ContentScale.Crop,
             modifier = Modifier
-                .align(Alignment.Center)
                 .graphicsLayer {
                     clip = true
                     renderEffect = RenderEffect.createRuntimeShaderEffect(shader, "composable")

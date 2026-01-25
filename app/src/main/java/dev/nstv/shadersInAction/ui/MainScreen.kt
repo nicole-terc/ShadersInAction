@@ -27,7 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import dev.nstv.shadersInAction.R
-import dev.nstv.shadersInAction.ui.screens.ScreenB
+import dev.nstv.shadersInAction.ui.screens.ImageScreen
 import dev.nstv.shadersInAction.ui.screens.TextScreen
 import dev.nstv.shadersInAction.ui.theme.Grid
 import kotlinx.coroutines.launch
@@ -39,7 +39,7 @@ const val Sheep = false
 
 enum class DrawerDestination(val title: String) {
     TextScreen("Text Screen"),
-    ScreenB("Screen B"),
+    ImageScreen("Image Screen"),
 
 }
 
@@ -48,7 +48,7 @@ enum class DrawerDestination(val title: String) {
 fun MainScreen(
     modifier: Modifier = Modifier,
 ) {
-    val backStack = remember { listOf<Any>(DrawerDestination.TextScreen).toMutableStateList() }
+    val backStack = remember { listOf<Any>(DrawerDestination.ImageScreen).toMutableStateList() }
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val currentDestination = backStack.lastOrNull() as? DrawerDestination
@@ -93,7 +93,7 @@ fun MainScreen(
                 onBack = { backStack.popLast() },
                 entryProvider = entryProvider {
                     entry(DrawerDestination.TextScreen) { TextScreen() }
-                    entry(DrawerDestination.ScreenB) { ScreenB() }
+                    entry(DrawerDestination.ImageScreen) { ImageScreen() }
                 }
             )
         }
