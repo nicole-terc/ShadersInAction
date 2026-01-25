@@ -2,19 +2,15 @@ package dev.nstv.shadersInAction.ui.screens
 
 import android.graphics.RenderEffect
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Box
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asComposeRenderEffect
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.imageResource
 import dev.nstv.shadersInAction.R
+import dev.nstv.shadersInAction.ui.components.ShadersWrapper
 
 @Composable
 fun ImageScreen(modifier: Modifier = Modifier) {

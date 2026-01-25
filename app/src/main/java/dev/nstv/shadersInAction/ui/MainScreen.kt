@@ -28,6 +28,7 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import dev.nstv.shadersInAction.R
 import dev.nstv.shadersInAction.ui.screens.ImageScreen
+import dev.nstv.shadersInAction.ui.screens.TimeShadersScreen
 import dev.nstv.shadersInAction.ui.screens.TextScreen
 import dev.nstv.shadersInAction.ui.theme.Grid
 import kotlinx.coroutines.launch
@@ -40,7 +41,8 @@ const val Sheep = false
 enum class DrawerDestination(val title: String) {
     TextScreen("Text Screen"),
     ImageScreen("Image Screen"),
-
+    TimeScreen("Time Shaders Screen")
+    ;
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -48,7 +50,7 @@ enum class DrawerDestination(val title: String) {
 fun MainScreen(
     modifier: Modifier = Modifier,
 ) {
-    val backStack = remember { listOf<Any>(DrawerDestination.ImageScreen).toMutableStateList() }
+    val backStack = remember { listOf<Any>(DrawerDestination.TimeScreen).toMutableStateList() }
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val currentDestination = backStack.lastOrNull() as? DrawerDestination
@@ -94,6 +96,7 @@ fun MainScreen(
                 entryProvider = entryProvider {
                     entry(DrawerDestination.TextScreen) { TextScreen() }
                     entry(DrawerDestination.ImageScreen) { ImageScreen() }
+                    entry(DrawerDestination.TimeScreen) { TimeShadersScreen() }
                 }
             )
         }

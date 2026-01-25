@@ -1,4 +1,4 @@
-package dev.nstv.shadersInAction.ui.screens
+package dev.nstv.shadersInAction.ui.components
 
 import android.graphics.RuntimeShader
 import androidx.compose.foundation.layout.Box
