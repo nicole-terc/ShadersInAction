@@ -167,47 +167,6 @@ const val RIPPLE = """
 
 // tweaked with chatGPT
 @Language("AGSL")
-const val RIPPLE_POINTER_SIMPLE = """
-    uniform shader composable;
-    uniform float2 size;
-    uniform float time;
-    uniform float2 pointer; 
-    
-    half4 main(float2 fragCoord) {
-        float2 uv = fragCoord / max(size, float2(1.0));
-        float2 puv = pointer / max(size, float2(1.0));
-    
-        // Distance to pointer (aspect-correct so falloff stays circular)
-        float2 d = uv - puv;
-        d.x *= size.x / size.y;
-        float dist = length(d);
-    
-        // Influence radius (normalized UV space)
-        float influence = smoothstep(0.35, 0.0, dist);
-    
-        float t = time * 0.9;
-    
-        // Radial ripple centered on the pointer
-        float waves = sin(dist * 60.0 - t * 6.0);
-    
-        // Subtle wobble to avoid perfect rings
-        float wobble = sin((uv.x * 8.0 + uv.y * 6.0) + t) * 0.5;
-    
-        // Amplitude grows near the pointer
-        float amp = (0.002 + 0.006 * influence) * (0.6 + 0.4 * waves) * (0.85 + 0.15 * wobble);
-    
-        // Offset direction: outward from the pointer
-        float2 dir = (dist > 1e-4) ? (d / dist) : float2(0.0, 0.0);
-    
-        // Convert UV offset to pixel offset for composable sampling
-        float2 offsetPx = (dir * amp) * size;
-    
-        return composable.eval(fragCoord + offsetPx);
-    }
-"""
-
-// tweaked with chatGPT
-@Language("AGSL")
 const val FLOW_FIELD = """
     uniform shader composable;
     uniform float2 size;

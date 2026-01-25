@@ -4,22 +4,26 @@ import android.graphics.RuntimeShader
 
 object Shaders {
 
-    // Runtime Shaders
+    // Simple Shaders
     val none = RuntimeShader(NONE).apply {
         setFloatUniform("time", 0f)
     }
     val red = RuntimeShader(RED)
     val green = RuntimeShader(GREEN)
     val blue = RuntimeShader(BLUE)
+    val rgbVertical = RuntimeShader(RGB_VERTICAL)
+    val rgbHorizontal = RuntimeShader(RGB_HORIZONTAL)
     val chromaticAberration = RuntimeShader(CHROMATIC_ABERRATION).apply {
         setFloatUniform("distortion", 30f)
     }
     val vignette = RuntimeShader(VIGNETTE)
+    val blur = RuntimeShader(BLUR)
+    val frostedGlass = RuntimeShader(FROSTED_GLASS)
+
+    // With time parameter
     val bokeh = RuntimeShader(BOKEH).apply {
         setFloatUniform("time", 0f)
     }
-    val blur = RuntimeShader(BLUR)
-    val frostedGlass = RuntimeShader(FROSTED_GLASS)
     val liquid = RuntimeShader(LIQUID).apply {
         setFloatUniform("time", 0f)
     }
@@ -36,6 +40,10 @@ object Shaders {
         setFloatUniform("time", 100f)
     }
 
+    // with pointer and time
+    val ripplePointer = RuntimeShader(RIPPLE_POINTER_SIMPLE)
+    val expansiveDiffusion = RuntimeShader(EXPANSIVE_DIFFUSION)
+
 
     fun getRenderShaders(
     ) = mapOf(
@@ -43,6 +51,8 @@ object Shaders {
         "red" to red,
         "green" to green,
         "blue" to blue,
+        "rgb vertical" to rgbVertical,
+        "rgb horizontal" to rgbHorizontal,
         "chromatic aberration" to chromaticAberration,
         "vignette" to vignette,
         "bokeh" to bokeh,
@@ -63,5 +73,10 @@ object Shaders {
         "bokeh" to bokeh,
         "flow field" to flowField,
         "flow field 2" to flowField2,
+    )
+
+    fun getShadersWithPointer() = mapOf(
+        "ripple pointer" to ripplePointer,
+        "expansive diffusion" to expansiveDiffusion,
     )
 }

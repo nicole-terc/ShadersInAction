@@ -28,6 +28,7 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import dev.nstv.shadersInAction.R
 import dev.nstv.shadersInAction.ui.screens.ImageScreen
+import dev.nstv.shadersInAction.ui.screens.PointerShadersScreen
 import dev.nstv.shadersInAction.ui.screens.TimeShadersScreen
 import dev.nstv.shadersInAction.ui.screens.TextScreen
 import dev.nstv.shadersInAction.ui.theme.Grid
@@ -41,7 +42,8 @@ const val Sheep = false
 enum class DrawerDestination(val title: String) {
     TextScreen("Text Screen"),
     ImageScreen("Image Screen"),
-    TimeScreen("Time Shaders Screen")
+    TimeScreen("Time Shaders Screen"),
+    PointerScreen("Pointer Shaders Screen"),
     ;
 }
 
@@ -50,7 +52,7 @@ enum class DrawerDestination(val title: String) {
 fun MainScreen(
     modifier: Modifier = Modifier,
 ) {
-    val backStack = remember { listOf<Any>(DrawerDestination.TimeScreen).toMutableStateList() }
+    val backStack = remember { listOf<Any>(DrawerDestination.PointerScreen).toMutableStateList() }
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val currentDestination = backStack.lastOrNull() as? DrawerDestination
@@ -59,6 +61,7 @@ fun MainScreen(
     ModalNavigationDrawer(
         modifier = modifier,
         drawerState = drawerState,
+        gesturesEnabled = false,
         drawerContent = {
             DrawerContent(
                 currentDestination = currentDestination,
@@ -97,6 +100,7 @@ fun MainScreen(
                     entry(DrawerDestination.TextScreen) { TextScreen() }
                     entry(DrawerDestination.ImageScreen) { ImageScreen() }
                     entry(DrawerDestination.TimeScreen) { TimeShadersScreen() }
+                    entry(DrawerDestination.PointerScreen) { PointerShadersScreen() }
                 }
             )
         }
