@@ -43,6 +43,7 @@ object Shaders {
     // with pointer and time
     val ripplePointer = RuntimeShader(RIPPLE_POINTER_SIMPLE)
     val expansiveDiffusion = RuntimeShader(EXPANSIVE_DIFFUSION)
+    val expansiveDiffusionTwo = RuntimeShader(EXPANSIVE_DIFFUSION_TWO)
 
 
     fun getRenderShaders(
@@ -78,5 +79,6 @@ object Shaders {
     fun getShadersWithPointer() = mapOf(
         "ripple pointer" to ripplePointer,
         "expansive diffusion" to expansiveDiffusion,
+        "expansive diffusion 2" to expansiveDiffusionTwo,
     )
 }

@@ -1,13 +1,18 @@
 package dev.nstv.shadersInAction.ui.screens
 
 import android.graphics.RenderEffect
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.VectorConverter
+import androidx.compose.animation.core.animateOffsetAsState
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -20,13 +25,15 @@ import androidx.compose.ui.res.imageResource
 import dev.nstv.shadersInAction.R
 import dev.nstv.shadersInAction.ui.components.BoxWithTime
 import dev.nstv.shadersInAction.ui.components.ShadersWrapper
+import dev.nstv.shadersInAction.ui.components.dragAndTapDetection
 import dev.nstv.shadersInAction.ui.shaders.Shaders
+import kotlinx.coroutines.launch
 
 @Composable
 fun PointerShadersScreen(modifier: Modifier = Modifier) {
-
-    var touchPosition by remember { mutableStateOf(Offset.Zero) }
-    var touchPositionDelta by remember { mutableStateOf(Offset.Zero) }
+    val coroutineScope = rememberCoroutineScope()
+    var touchPosition = remember { Animatable(Offset.Zero, Offset.VectorConverter) }
+    var touchPositionDelta = remember { Animatable(Offset.Zero, Offset.VectorConverter) }
 
     ShadersWrapper(
         shadersMap = Shaders.getShadersWithPointer(),
@@ -43,32 +50,33 @@ fun PointerShadersScreen(modifier: Modifier = Modifier) {
                 contentDescription = "Sheep",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .pointerInput(Unit) {
-                        detectTapGestures(
-                            onTap = { offset ->
-                                touchPositionDelta = offset - touchPosition
-                                touchPosition = offset
-
+                    .dragAndTapDetection(
+                        onTap = { offset ->
+                            coroutineScope.launch {
+                                touchPositionDelta.snapTo(Offset.Zero)
+                                touchPosition.snapTo(offset)
                             }
-                        )
-                        detectDragGestures { change, dragAmount ->
-                            touchPosition = change.position
-                            touchPositionDelta = dragAmount
+                        },
+                        onDrag = { change, dragAmount ->
+                            coroutineScope.launch {
+                                touchPosition.snapTo(change.position)
+                                touchPositionDelta.snapTo(dragAmount)
+                            }
                         }
-                    }
+                    )
                     .graphicsLayer {
                         clip = true
                         shader.setFloatUniform("size", floatArrayOf(size.width, size.height))
                         shader.setFloatUniform("time", time)
                         shader.setFloatUniform(
                             "pointer",
-                            floatArrayOf(touchPosition.x, touchPosition.y)
+                            floatArrayOf(touchPosition.value.x, touchPosition.value.y)
                         )
                         shader.setFloatUniform(
                             "pointerDelta",
                             floatArrayOf(
-                                touchPositionDelta.x / size.width,
-                                touchPositionDelta.y / size.height
+                                touchPositionDelta.value.x / size.width,
+                                touchPositionDelta.value.y / size.height
                             )
                         )
 
