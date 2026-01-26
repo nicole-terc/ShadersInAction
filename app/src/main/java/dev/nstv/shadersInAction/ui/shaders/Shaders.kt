@@ -4,6 +4,14 @@ import android.graphics.RuntimeShader
 
 object Shaders {
 
+    // Standalone shaders
+    val solo_white = RuntimeShader(SOLO_WHITE)
+    val solo_red = RuntimeShader(SOLO_RED)
+    val solo_green = RuntimeShader(SOLO_GREEN)
+    val solo_blue = RuntimeShader(SOLO_BLUE)
+    val solo_rgb_vertical = RuntimeShader(SOLO_RGB_VERTICAL)
+    val solo_rgb_horizontal = RuntimeShader(SOLO_RGB_HORIZONTAL)
+
     // Simple Shaders
     val none = RuntimeShader(NONE).apply {
         setFloatUniform("time", 0f)
@@ -45,6 +53,14 @@ object Shaders {
     val expansiveDiffusion = RuntimeShader(EXPANSIVE_DIFFUSION)
     val expansiveDiffusionTwo = RuntimeShader(EXPANSIVE_DIFFUSION_TWO)
 
+    fun getStandaloneShaders() = mapOf(
+        "solo white" to solo_white,
+        "solo red" to solo_red,
+        "solo green" to solo_green,
+        "solo blue" to solo_blue,
+        "solo rgb vertical" to solo_rgb_vertical,
+        "solo rgb horizontal" to solo_rgb_horizontal,
+    )
 
     fun getRenderShaders(
     ) = mapOf(
