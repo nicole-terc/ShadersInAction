@@ -27,7 +27,7 @@ fun SimpleScreen(
                     .drawWithCache {
                         val shaderBrush = ShaderBrush(shader)
                         shader.setFloatUniform("size", floatArrayOf(size.width, size.height))
-                        shader.setFloatUniform("time", 0f)
+                        shader.setFloatUniform("time", time)
                         onDrawBehind {
                             drawRect(shaderBrush)
                         }

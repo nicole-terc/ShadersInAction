@@ -9,8 +9,11 @@ object Shaders {
     val solo_red = RuntimeShader(SOLO_RED)
     val solo_green = RuntimeShader(SOLO_GREEN)
     val solo_blue = RuntimeShader(SOLO_BLUE)
+    val solo_rb_vertical = RuntimeShader(SOLO_RB_VERTICAL)
+    val solo_rb_vertical_mix = RuntimeShader(SOLO_RB_VERTICAL_MIX)
     val solo_rgb_vertical = RuntimeShader(SOLO_RGB_VERTICAL)
     val solo_rgb_horizontal = RuntimeShader(SOLO_RGB_HORIZONTAL)
+    val solo_fractal = RuntimeShader(SOLO_FRACTAL)
 
     // Simple Shaders
     val none = RuntimeShader(NONE).apply {
@@ -55,12 +58,16 @@ object Shaders {
 
     fun getStandaloneShaders() = mapOf(
         "solo white" to solo_white,
-        "solo red" to solo_red,
-        "solo green" to solo_green,
-        "solo blue" to solo_blue,
+//        "solo red" to solo_red,
+//        "solo green" to solo_green,
+//        "solo blue" to solo_blue,
+        "solo rb vertical" to solo_rb_vertical,
+        "solo rb vertical mix" to solo_rb_vertical_mix,
         "solo rgb vertical" to solo_rgb_vertical,
         "solo rgb horizontal" to solo_rgb_horizontal,
+        "solo fractal" to solo_fractal,
     )
+
 
     fun getRenderShaders(
     ) = mapOf(
