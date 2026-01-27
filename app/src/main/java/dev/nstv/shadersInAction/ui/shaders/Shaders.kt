@@ -50,6 +50,9 @@ object Shaders {
     val flowField2 = RuntimeShader(FLOW_FIELD_TWO).apply {
         setFloatUniform("time", 100f)
     }
+    val fractal = RuntimeShader(FRACTAL).apply {
+        setFloatUniform("time", 0f)
+    }
 
     // with pointer and time
     val ripplePointer = RuntimeShader(RIPPLE_POINTER_SIMPLE)
@@ -88,6 +91,7 @@ object Shaders {
         "flow field 2" to flowField2,
         "water color" to waterColor,
         "oil painting" to oilPainting,
+        "fractal" to fractal,
     )
 
     fun getShadersWithTime() = mapOf(
@@ -97,6 +101,7 @@ object Shaders {
         "bokeh" to bokeh,
         "flow field" to flowField,
         "flow field 2" to flowField2,
+        "fractal" to fractal,
     )
 
     fun getShadersWithPointer() = mapOf(

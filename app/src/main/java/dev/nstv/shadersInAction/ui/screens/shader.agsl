@@ -1,0 +1,55 @@
+// Slides samples
+
+half4 main(float2 fragCoord) {
+    bool flag = false;
+    int one = 1;
+    float two = 2.0;
+}
+
+
+half4 main(float2 fragCoord) {
+    float x = 1.0;
+    float2 xy = float2(1.0, 2.0);
+    float3 xyz = float3(1.0, 2.0, 3.0);
+    float4 xyzw = float4(1.0, 2.0, 3.0, 4.0);
+}
+
+half4 main(float2 fragCoord) {
+    half x = 1.0;
+    half2 xy = half2(1.0, 2.0);
+    half3 xyz = half3(1.0, 2.0, 3.0);
+    half4 xyzw = half4(1.0, 2.0, 3.0, 4.0);
+}
+
+half4 main(float2 fragCoord) {
+    half4 vector = half4(1.0, 2.0, 3.0, 4.0);
+    half4 inverse = vector.wzyx; // 4.0, 3.0, 2.0, 1.0
+    half2 xy = vector.xy; // 1.0, 2.0
+    half x = vector.x; // 1.0
+}
+
+half4 main(float2 fragCoord) {
+    half4 vector = half4(1.0, 2.0, 3.0, 4.0);
+    half x = vector.x; // 1.0
+    half y = vector.y; // 2.0
+    half z = vector.z; // 3.0
+    half w = vector.w; // 4.0
+}
+
+half4 main(float2 fragCoord) {
+    half4 vector = half4(1.0, 2.0, 3.0, 4.0);
+    half x = vector.x; // 1.0
+    half2 xy = vector.xy; // 1.0, 2.0
+    half3 xyz = vector.xyz; // 1.0, 2.0, 3.0
+    half4 xxyy = vector.xxyy; // 1.0, 1.0, 2.0, 2.0
+}
+
+
+half4 main(float2 fragCoord) {
+    uniform float2 size;
+
+    if(fragCoord.x < size/2.0){
+        return half4(1.0, 0.0, 0.0, 1.0); //RED
+    }
+    return half4(0.0, 0.0, 1.0, 1.0);//BLUE
+}

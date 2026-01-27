@@ -27,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import dev.nstv.shadersInAction.R
+import dev.nstv.shadersInAction.ui.screens.DemoScreen
 import dev.nstv.shadersInAction.ui.screens.ImageScreen
 import dev.nstv.shadersInAction.ui.screens.PointerShadersScreen
 import dev.nstv.shadersInAction.ui.screens.SimpleScreen
@@ -41,6 +42,7 @@ const val Sheep = false
 // End Config
 
 enum class DrawerDestination(val title: String) {
+    DemoScreen("Demo Screen"),
     SimpleScreen("Simple Screen"),
     TextScreen("Text Screen"),
     ImageScreen("Image Screen"),
@@ -54,7 +56,7 @@ enum class DrawerDestination(val title: String) {
 fun MainScreen(
     modifier: Modifier = Modifier,
 ) {
-    val backStack = remember { listOf<Any>(DrawerDestination.SimpleScreen).toMutableStateList() }
+    val backStack = remember { listOf<Any>(DrawerDestination.DemoScreen).toMutableStateList() }
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val currentDestination = backStack.lastOrNull() as? DrawerDestination
@@ -78,18 +80,20 @@ fun MainScreen(
     ) {
         Scaffold(
             topBar = {
-                TopAppBar(
-                    title = { Text(currentDestination.title) },
-                    navigationIcon = {
-                        Icon(
-                            painterResource(R.drawable.menu),
-                            contentDescription = "Open navigation drawer",
-                            modifier = Modifier
-                                .size(Grid.Three)
-                                .clickable { scope.launch { drawerState.open() } }
-                        )
-                    },
-                )
+                if (!HideOptions) {
+                    TopAppBar(
+                        title = { Text(currentDestination.title) },
+                        navigationIcon = {
+                            Icon(
+                                painterResource(R.drawable.menu),
+                                contentDescription = "Open navigation drawer",
+                                modifier = Modifier
+                                    .size(Grid.Three)
+                                    .clickable { scope.launch { drawerState.open() } }
+                            )
+                        },
+                    )
+                }
             },
         ) { padding ->
             NavDisplay(
@@ -99,6 +103,7 @@ fun MainScreen(
                 backStack = backStack,
                 onBack = { backStack.popLast() },
                 entryProvider = entryProvider {
+                    entry(DrawerDestination.DemoScreen) { DemoScreen() }
                     entry(DrawerDestination.SimpleScreen) { SimpleScreen() }
                     entry(DrawerDestination.TextScreen) { TextScreen() }
                     entry(DrawerDestination.ImageScreen) { ImageScreen() }

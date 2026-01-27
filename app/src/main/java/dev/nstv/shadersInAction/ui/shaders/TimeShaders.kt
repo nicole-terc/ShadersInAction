@@ -405,3 +405,50 @@ const val FLOW_FIELD_TWO = """
     }
 
 """
+
+// inspiration: https://www.shadertoy.com/view/mtyGWy
+@Language("AGSL")
+const val FRACTAL="""
+    uniform shader composable;
+    uniform float time;
+    uniform float2 size;
+
+    float sdBox(float2 p, float2 b) {
+        float2 d = abs(p) - b;
+        return length(max(d, 0.0)) + min(max(d.x, d.y), 0.0);
+    }
+    
+    half4 main(float2 fragCoord) {
+        half4 base = composable.eval(fragCoord);
+        float2 uv  = (fragCoord * 2.0 - size.xy) / size.y;
+        float2 uv0 = uv;
+    
+        half3 finalColor = half3(0.0);
+    
+        for (int layer = 0; layer < 10; layer++) {
+            float i = float(layer);
+    
+            uv = fract(uv * 2.0) - 0.5;
+    
+            // Circle version
+            float d = length(uv) * exp(-length(uv0));
+    
+            // Square version
+            // float2 square = float2(0.9, 0.6);
+            // float d = sdBox(uv, square);
+    
+            half3 color = base.rgb;
+    
+            d = sin(d * 8.0 + time) / 8.0;
+            d = abs(d);
+    
+            // avoid division-by-zero explosions
+            d = max(d, 1e-5);
+    
+            d = pow(0.001 / d, 1.2);
+    
+            finalColor += color * half(d);
+        }
+        return half4(finalColor, base.a);
+    }
+"""
