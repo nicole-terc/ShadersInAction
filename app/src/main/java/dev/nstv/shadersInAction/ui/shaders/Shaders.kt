@@ -22,8 +22,10 @@ object Shaders {
     val red = RuntimeShader(RED)
     val green = RuntimeShader(GREEN)
     val blue = RuntimeShader(BLUE)
+    val rbVertical = RuntimeShader(RB_VERTICAL)
     val rgbVertical = RuntimeShader(RGB_VERTICAL)
     val rgbHorizontal = RuntimeShader(RGB_HORIZONTAL)
+    val grayscale = RuntimeShader(GRAYSCALE)
     val chromaticAberration = RuntimeShader(CHROMATIC_ABERRATION).apply {
         setFloatUniform("distortion", 30f)
     }
@@ -53,6 +55,10 @@ object Shaders {
     val fractal = RuntimeShader(FRACTAL).apply {
         setFloatUniform("time", 0f)
     }
+    val liquidWarp = RuntimeShader(LIQUID_WARP)
+    val balatroWarp = RuntimeShader(BALATRO_WARP)
+    val balatroWarpLike = RuntimeShader(BALATRO_WARP_LIKE)
+    val noiseGrid = RuntimeShader(NOISE_GRID)
 
     // with pointer and time
     val ripplePointer = RuntimeShader(RIPPLE_POINTER_SIMPLE)
@@ -78,8 +84,10 @@ object Shaders {
         "red" to red,
         "green" to green,
         "blue" to blue,
+        "rb vertical" to rbVertical,
         "rgb vertical" to rgbVertical,
         "rgb horizontal" to rgbHorizontal,
+        "grayscale" to grayscale,
         "chromatic aberration" to chromaticAberration,
         "vignette" to vignette,
         "bokeh" to bokeh,
@@ -102,6 +110,10 @@ object Shaders {
         "flow field" to flowField,
         "flow field 2" to flowField2,
         "fractal" to fractal,
+        "liquid warp" to liquidWarp,
+        "balatro warp" to balatroWarp,
+        "balatro warp like" to balatroWarpLike,
+        "noise grid" to noiseGrid,
     )
 
     fun getShadersWithPointer() = mapOf(

@@ -452,3 +452,422 @@ const val FRACTAL="""
         return half4(finalColor, base.a);
     }
 """
+
+// inspiration: https://www.shadertoy.com/view/wtXXD2
+@Language("AGSL")
+const val LIQUID_WARP = """
+    uniform float time;
+    uniform float2 size;
+    uniform shader composable;
+    
+    float hash1(float2 p) {
+        return fract(sin(dot(p, float2(127.1, 311.7))) * 43758.5453123);
+    }
+    
+    float noise2(float2 x) {
+        float2 p = floor(x);
+        float2 f = fract(x);
+        f = f * f * (3.0 - 2.0 * f);
+    
+        float a = hash1(p + float2(0.0, 0.0));
+        float b = hash1(p + float2(1.0, 0.0));
+        float c = hash1(p + float2(0.0, 1.0));
+        float d = hash1(p + float2(1.0, 1.0));
+    
+        return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+    }
+    
+    const mat2 mtx = mat2(0.80,  0.60,
+                          -0.60, 0.80);
+    
+    float fbm(float2 p) {
+        float f = 0.0;
+    
+        f += 0.500000 * noise2(p); p = (mtx * p) * 2.02;
+        f += 0.250000 * noise2(p); p = (mtx * p) * 2.03;
+        f += 0.125000 * noise2(p); p = (mtx * p) * 2.01;
+        f += 0.062500 * noise2(p); p = (mtx * p) * 2.04;
+        f += 0.031250 * noise2(p); p = (mtx * p) * 2.01;
+        f += 0.015625 * noise2(p);
+    
+        return f / 0.96875;
+    }
+    
+    float pattern(float2 p, float t, out float2 q, out float2 r, out float2 g) {
+        q = float2(fbm(p), fbm(p + float2(10.0, 1.3)));
+    
+        r = float2(
+            fbm(p + 4.0 * q + float2(t) + float2(1.7, 9.2)),
+            fbm(p + 4.0 * q + float2(t) + float2(8.3, 2.8))
+        );
+    
+        g = float2(
+            fbm(p + 2.0 * r + float2(t * 20.0) + float2(2.0, 6.0)),
+            fbm(p + 2.0 * r + float2(t * 10.0) + float2(5.0, 3.0))
+        );
+    
+        return fbm(p + 5.5 * g + float2(-t * 7.0));
+    }
+    
+    // ---------- main ----------
+    half4 main(float2 fragCoord) {
+        float2 uv = fragCoord / size;
+    
+        float2 q, r, g;
+        float n = pattern(fragCoord * float2(0.004), time * 0.007, q, r, g);
+    
+        // Domain warp amount (tweak this)
+        // Bigger values = stronger distortion
+        float warpStrength = 0.1;
+    
+        // Build a warp vector from the domain-warp intermediates.
+        float2 warp = (g - 0.5) * warpStrength;
+    
+        // Warp in UV space, then clamp to avoid sampling outside the image
+        float2 warpedUv = clamp(uv + warp, 0.0, 1.0);
+    
+        // Sample your image for the colors
+        half4 img = composable.eval(warpedUv * size);
+    
+        // Optional: use the pattern to add subtle contrast (comment out if unwanted)
+        float contrast = 0.85 + 0.75 * n; // ~0.85..1.60
+        half3 rgb = img.rgb * half3(contrast);
+    
+        // Optional vignette, similar vibe to original (comment out if unwanted)
+        float vig = 0.70 + 0.65 * sqrt(70.0 * uv.x * uv.y * (1.0 - uv.x) * (1.0 - uv.y));
+        rgb *= half3(vig);
+    
+        return half4(rgb, img.a);
+    }
+"""
+
+// inspiration: https://www.shadertoy.com/view/XXtBRr
+@Language("AGSL")
+const val BALATRO_WARP = """
+    uniform float time;
+    uniform float2 size;
+    uniform shader composable;
+    
+    // ---- Configuration ----
+    const float SPIN_ROTATION = -2.0;
+    const float SPIN_SPEED = 7.0;
+    const float2 OFFSET = float2(0.0, 0.0);
+    
+    const float4 COLOUR_1 = float4(0.871, 0.267, 0.231, 1.0);
+    const float4 COLOUR_2 = float4(0.0, 0.42, 0.706, 1.0);
+    const float4 COLOUR_3 = float4(0.086, 0.137, 0.145, 1.0);
+    
+    const float CONTRAST = 3.5;
+    const float LIGTHING = 0.4;
+    const float SPIN_AMOUNT = 0.25;
+    const float PIXEL_FILTER = 745.0;
+    const float SPIN_EASE = 1.0;
+    
+    // AGSL doesn't have preprocessor booleans; use 0.0/1.0
+    // 1.0 => rotate with time, 0.0 => static angle
+    const float IS_ROTATE = 0.0;
+    
+    // -----------------------
+    
+    float4 effect(float2 screenSize, float2 screenCoords) {
+        float pixelSize = length(screenSize) / PIXEL_FILTER;
+    
+        // Pixelation + normalize to [-0.5..0.5]ish, matching original approach
+        float2 uv = (floor(screenCoords * (1.0 / pixelSize)) * pixelSize - 0.5 * screenSize)
+                    / length(screenSize) - OFFSET;
+    
+        float uvLen = length(uv);
+    
+        float speed = (SPIN_ROTATION * SPIN_EASE * 0.2);
+        // if(IS_ROTATE) speed = time * speed;
+        speed = mix(speed, time * speed, IS_ROTATE);
+    
+        speed += 302.2;
+    
+        float newPixelAngle =
+            atan(uv.y, uv.x)
+            + speed
+            - SPIN_EASE * 20.0 * (SPIN_AMOUNT * uvLen + (1.0 - SPIN_AMOUNT));
+    
+        float2 mid = (screenSize / length(screenSize)) * 0.5;
+    
+        uv = (float2(uvLen * cos(newPixelAngle) + mid.x,
+                     uvLen * sin(newPixelAngle) + mid.y) - mid);
+    
+        uv *= 30.0;
+    
+        speed = time * SPIN_SPEED;
+    
+        float2 uv2 = float2(uv.x + uv.y, uv.x + uv.y);
+    
+        // Fixed-iteration loop is fine in AGSL
+        for (int i = 0; i < 5; i++) {
+            uv2 += sin(max(uv.x, uv.y)) + uv;
+    
+            uv += 0.5 * float2(
+                cos(5.1123314 + 0.353 * uv2.y + speed * 0.131121),
+                sin(uv2.x - 0.113 * speed)
+            );
+    
+            uv -= 1.0 * cos(uv.x + uv.y) - 1.0 * sin(uv.x * 0.711 - uv.y);
+        }
+    
+        float contrastMod = (0.25 * CONTRAST + 0.5 * SPIN_AMOUNT + 1.2);
+    
+        float paintRes = min(2.0, max(0.0, length(uv) * 0.035 * contrastMod));
+    
+        float c1p = max(0.0, 1.0 - contrastMod * abs(1.0 - paintRes));
+        float c2p = max(0.0, 1.0 - contrastMod * abs(paintRes));
+        float c3p = 1.0 - min(1.0, c1p + c2p);
+    
+        float light =
+            (LIGTHING - 0.2) * max(c1p * 5.0 - 4.0, 0.0) +
+            LIGTHING * max(c2p * 5.0 - 4.0, 0.0);
+    
+        return (0.3 / CONTRAST) * COLOUR_1 +
+               (1.0 - 0.3 / CONTRAST) *
+               (COLOUR_1 * c1p +
+                COLOUR_2 * c2p +
+                float4(c3p * COLOUR_3.rgb, c3p * COLOUR_1.a)) +
+               light;
+    }
+    
+    half4 main(float2 fragCoord) {
+        float2 screenSize = size;
+        float2 screenCoords = fragCoord;
+    
+        float4 col = effect(screenSize, screenCoords);
+    
+        // If you want to blend over the image instead of pure procedural:
+        // half4 base = composable.eval(fragCoord);
+        // col = mix(float4(base.rgb, base.a), col, 0.8);
+    
+        return half4(col);
+    }
+"""
+
+@Language("AGSL")
+const val BALATRO_WARP_LIKE = """
+    uniform float time;
+    uniform float2 size;
+    uniform shader composable;
+    
+    // ---- Configuration ----
+    const float SPIN_ROTATION = -2.0;
+    const float SPIN_SPEED = 7.0;
+    const float2 OFFSET = float2(0.0, 0.0);
+    
+    const float CONTRAST = 3.5;
+    const float SPIN_AMOUNT = 0.25;
+    const float PIXEL_FILTER = 745.0;
+    const float SPIN_EASE = 1.0;
+    
+    // 1.0 => rotates with time, 0.0 => static
+    const float IS_ROTATE = 0.0;
+    
+    // -----------------------
+    
+    float2 warpUv(float2 screenSize, float2 screenCoords) {
+        float pixelSize = length(screenSize) / PIXEL_FILTER;
+    
+        // pixelate the coordinate used for the warp (keeps that crunchy look)
+        float2 uv = (floor(screenCoords * (1.0 / pixelSize)) * pixelSize - 0.5 * screenSize)
+                    / length(screenSize) - OFFSET;
+    
+        float uvLen = length(uv);
+    
+        float speed = (SPIN_ROTATION * SPIN_EASE * 0.2);
+        speed = mix(speed, time * speed, IS_ROTATE);
+        speed += 302.2;
+    
+        float angle =
+            atan(uv.y, uv.x)
+            + speed
+            - SPIN_EASE * 20.0 * (SPIN_AMOUNT * uvLen + (1.0 - SPIN_AMOUNT));
+    
+        float2 mid = (screenSize / length(screenSize)) * 0.5;
+        uv = (float2(uvLen * cos(angle) + mid.x,
+                     uvLen * sin(angle) + mid.y) - mid);
+    
+        uv *= 30.0;
+    
+        float anim = time * SPIN_SPEED;
+        float2 uv2 = float2(uv.x + uv.y, uv.x + uv.y);
+    
+        for (int i = 0; i < 5; i++) {
+            uv2 += sin(max(uv.x, uv.y)) + uv;
+    
+            uv += 0.5 * float2(
+                cos(5.1123314 + 0.353 * uv2.y + anim * 0.131121),
+                sin(uv2.x - 0.113 * anim)
+            );
+    
+            uv -= 1.0 * cos(uv.x + uv.y) - 1.0 * sin(uv.x * 0.711 - uv.y);
+        }
+    
+        // Use the same "paintRes" idea to produce a stable warp direction.
+        float contrastMod = (0.25 * CONTRAST + 0.5 * SPIN_AMOUNT + 1.2);
+        float paintRes = min(2.0, max(0.0, length(uv) * 0.035 * contrastMod));
+    
+        // Turn scalar fields into a 2D displacement.
+        // This keeps the "look" tied to the original math but makes it usable as UV warp.
+        float2 disp = float2(
+            sin(uv.x + paintRes * 2.0),
+            cos(uv.y - paintRes * 2.0)
+        );
+    
+        // Warp strength: tune 0.002..0.02 depending on how strong you want it
+        float warpStrength = (1.0 / PIXEL_FILTER) * 12.0;
+    
+        // Convert from the uv-domain to screen UV space
+        float2 baseUv = screenCoords / screenSize;
+    
+        float2 warpedUv = baseUv + disp * warpStrength;
+    
+        // Clamp to avoid sampling outside image
+        return clamp(warpedUv, 0.0, 1.0);
+    }
+    
+    half4 main(float2 fragCoord) {
+        float2 warpedUv = warpUv(size, fragCoord);
+    
+        // Sample your image: COLORS come from composable
+        half4 img = composable.eval(warpedUv * size);
+    
+        return img;
+    }
+"""
+
+// Mine, chatGPT assisted
+@Language("AGSL")
+const val NOISE_GRID = """
+    uniform shader composable;
+    uniform float2 size;
+    uniform float time;
+
+    // NOISE
+    float hash21(float2 p) {
+        p = fract(p * float2(123.34, 345.45));
+        p += dot(p, p + 34.345);
+        return fract(p.x * p.y);
+    }
+    
+    float noise21(float2 p) {
+        float2 i = floor(p);
+        float2 f = fract(p);
+        f = f * f * (3.0 - 2.0 * f);
+    
+        float a = hash21(i + float2(0.0, 0.0));
+        float b = hash21(i + float2(1.0, 0.0));
+        float c = hash21(i + float2(0.0, 1.0));
+        float d = hash21(i + float2(1.0, 1.0));
+    
+        return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+    }
+    
+    float2 grad2(float2 p) {
+        float n = sin(dot(p, float2(127.1, 311.7))) * 43758.5453;
+        float a = fract(n) * 6.28318;
+        return float2(cos(a), sin(a));
+    }
+    
+    float perlin2(float2 p) {
+        float2 i = floor(p);
+        float2 f = fract(p);
+    
+        float2 u = f * f * (3.0 - 2.0 * f);
+    
+        float2 g00 = grad2(i + float2(0, 0));
+        float2 g10 = grad2(i + float2(1, 0));
+        float2 g01 = grad2(i + float2(0, 1));
+        float2 g11 = grad2(i + float2(1, 1));
+    
+        float n00 = dot(g00, f - float2(0, 0));
+        float n10 = dot(g10, f - float2(1, 0));
+        float n01 = dot(g01, f - float2(0, 1));
+        float n11 = dot(g11, f - float2(1, 1));
+    
+        float nx0 = mix(n00, n10, u.x);
+        float nx1 = mix(n01, n11, u.x);
+        float nxy = mix(nx0, nx1, u.y);
+    
+        return 0.5 + 0.5 * nxy; // normalize to 0..1
+    }
+    
+    // "noise"
+    float trigNoise21(float2 p) {
+        // 0..1, stable, pseudo-random-ish
+        float v = sin(dot(p, float2(12.9898, 78.233)));
+        v *= cos(dot(p, float2(39.3467, 11.135)));
+        return 0.5 + 0.5 * sin(v * 43758.5453);
+    }
+    
+    // "noise"
+    float trigNoiseSmooth21(float2 p) {
+        float a = sin(p.x * 3.1) * cos(p.y * 4.7);
+        float b = sin((p.x + p.y) * 2.3);
+        float c = cos((p.x - p.y) * 2.9);
+        float v = a + 0.6 * b + 0.4 * c;          // roughly -2..2
+        return 0.5 + 0.5 * sin(v * 3.0);          // 0..1
+    }
+    
+    // END NOISE
+    
+    half4 main(float2 fragCoord) {
+        float2 uv = fragCoord / size;
+    
+        // ---- square grid derived from aspect ratio ----
+        float cellsAcross = 22.0;                 // tweak this (density)
+        float cellSizePx = size.x / cellsAcross;  // square cell size in pixels
+        float cellsDown  = size.y / cellSizePx;   // derived from size ratio
+    
+        float2 gridCells = float2(cellsAcross, cellsDown);
+    
+        float2 cell = uv * gridCells;
+        float2 cellId = floor(cell);
+        float2 cellUV = fract(cell);
+    
+        // Optional inner margin so you can "see" the squares as tiles
+        float margin = 0.08;
+        float edgeSoft = 0.01;
+    
+        float insideX =
+        smoothstep(margin, margin + edgeSoft, cellUV.x) *
+                (1.0 - smoothstep(1.0 - margin - edgeSoft, 1.0 - margin, cellUV.x));
+    
+        float insideY =
+        smoothstep(margin, margin + edgeSoft, cellUV.y) *
+                (1.0 - smoothstep(1.0 - margin - edgeSoft, 1.0 - margin, cellUV.y));
+    
+        float insideCell = insideX * insideY;
+    
+        // ---- blinking per-cell (noise + trig + smoothstep) ----
+        float blinkSpeed = 1.0;
+    
+        // stable random per cell
+        // Pick one noise
+        float n = noise21(cellId * 0.45);
+//        float n = perlin2(cellId * 0.25);
+//        float n = trigNoise21(cellId);
+//        float n = trigNoiseSmooth21(cellId);
+
+    
+        // 0..1 wave per cell
+        float wave = 0.5 + 0.5 * sin(time * blinkSpeed + n * 6.28318);
+    
+        float threshold = 0.55;
+        float softness  = 0.12;
+        float on = smoothstep(threshold - softness, threshold + softness, wave);
+    
+        float mask = on * insideCell;
+    
+        // ---- composite ----
+        half4 base = composable.eval(fragCoord);
+    
+        half dimAmount = 0.2; // how dark "off" cells are
+        half3 outRgb = mix(base.rgb * dimAmount, base.rgb, half(mask));
+    
+        return half4(outRgb, base.a);
+    }
+"""
+

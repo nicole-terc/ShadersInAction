@@ -1,4 +1,4 @@
-package dev.nstv.shadersinaction.theme
+package dev.nstv.shadersInAction.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

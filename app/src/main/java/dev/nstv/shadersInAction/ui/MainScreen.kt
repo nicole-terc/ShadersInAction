@@ -1,5 +1,7 @@
 package dev.nstv.shadersInAction.ui
 
+import android.graphics.RenderEffect
+import android.graphics.RuntimeShader
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -22,95 +24,122 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.asComposeRenderEffect
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import dev.nstv.shadersInAction.R
+import dev.nstv.shadersInAction.ui.components.BoxWithTime
+import dev.nstv.shadersInAction.ui.screens.BoringScreen
 import dev.nstv.shadersInAction.ui.screens.DemoScreen
 import dev.nstv.shadersInAction.ui.screens.ImageScreen
 import dev.nstv.shadersInAction.ui.screens.PointerShadersScreen
+import dev.nstv.shadersInAction.ui.screens.SHADER_SIX
 import dev.nstv.shadersInAction.ui.screens.SimpleScreen
-import dev.nstv.shadersInAction.ui.screens.TimeShadersScreen
 import dev.nstv.shadersInAction.ui.screens.TextScreen
+import dev.nstv.shadersInAction.ui.screens.TimeShadersScreen
 import dev.nstv.shadersInAction.ui.theme.Grid
 import kotlinx.coroutines.launch
 
 // Start Config
 const val HideOptions = false
-const val Sheep = false
+const val FullAppShader = false
+const val StopOtherAnimationsOnFullScreen = true
+
+val DefaultSpeed = if (FullAppShader && StopOtherAnimationsOnFullScreen) 0f else 1f
 // End Config
 
 enum class DrawerDestination(val title: String) {
-    DemoScreen("Demo Screen"),
     SimpleScreen("Simple Screen"),
     TextScreen("Text Screen"),
     ImageScreen("Image Screen"),
     TimeScreen("Time Shaders Screen"),
     PointerScreen("Pointer Shaders Screen"),
+    BoringScreen("Boring Screen"),
+    DemoScreen("Demo Screen"),
     ;
 }
+
+private val shader = RuntimeShader(SHADER_SIX)
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
     modifier: Modifier = Modifier,
 ) {
-    val backStack = remember { listOf<Any>(DrawerDestination.DemoScreen).toMutableStateList() }
+    val backStack = remember { listOf<Any>(DrawerDestination.BoringScreen).toMutableStateList() }
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val currentDestination = backStack.lastOrNull() as? DrawerDestination
         ?: DrawerDestination.TextScreen
 
-    ModalNavigationDrawer(
+    BoxWithTime(
         modifier = modifier,
-        drawerState = drawerState,
-        gesturesEnabled = false,
-        drawerContent = {
-            DrawerContent(
-                currentDestination = currentDestination,
-                onDestinationSelected = { destination ->
-                    if (destination != currentDestination) {
-                        backStack.resetTo(destination)
+        speed = if (FullAppShader) 1f else 0f,
+    ) { time ->
+        ModalNavigationDrawer(
+            modifier = Modifier
+                .fillMaxSize()
+                .graphicsLayer {
+                    if (FullAppShader) {
+                        shader.setFloatUniform("time", time)
+                        shader.setFloatUniform("size", floatArrayOf(size.width, size.height))
+                        renderEffect = RenderEffect.createRuntimeShaderEffect(shader, "composable")
+                            .asComposeRenderEffect()
                     }
-                    scope.launch { drawerState.close() }
                 },
-            )
-        },
-    ) {
-        Scaffold(
-            topBar = {
-                if (!HideOptions) {
-                    TopAppBar(
-                        title = { Text(currentDestination.title) },
-                        navigationIcon = {
-                            Icon(
-                                painterResource(R.drawable.menu),
-                                contentDescription = "Open navigation drawer",
-                                modifier = Modifier
-                                    .size(Grid.Three)
-                                    .clickable { scope.launch { drawerState.open() } }
-                            )
-                        },
-                    )
-                }
+            drawerState = drawerState,
+            gesturesEnabled = false,
+            drawerContent = {
+                DrawerContent(
+                    currentDestination = currentDestination,
+                    onDestinationSelected = { destination ->
+                        if (destination != currentDestination) {
+                            backStack.resetTo(destination)
+                        }
+                        scope.launch { drawerState.close() }
+                    },
+                )
             },
-        ) { padding ->
-            NavDisplay(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding),
-                backStack = backStack,
-                onBack = { backStack.popLast() },
-                entryProvider = entryProvider {
-                    entry(DrawerDestination.DemoScreen) { DemoScreen() }
-                    entry(DrawerDestination.SimpleScreen) { SimpleScreen() }
-                    entry(DrawerDestination.TextScreen) { TextScreen() }
-                    entry(DrawerDestination.ImageScreen) { ImageScreen() }
-                    entry(DrawerDestination.TimeScreen) { TimeShadersScreen() }
-                    entry(DrawerDestination.PointerScreen) { PointerShadersScreen() }
-                }
-            )
+        ) {
+            Scaffold(
+                topBar = {
+                    if (!HideOptions) {
+                        TopAppBar(
+                            title = { Text(currentDestination.title) },
+                            navigationIcon = {
+                                Icon(
+                                    painterResource(R.drawable.menu),
+                                    contentDescription = "Open navigation drawer",
+                                    modifier = Modifier
+                                        .size(Grid.Three)
+                                        .clickable { scope.launch { drawerState.open() } }
+                                )
+                            },
+                        )
+                    }
+                },
+            ) { padding ->
+                NavDisplay(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(padding),
+                    backStack = backStack,
+                    onBack = { backStack.popLast() },
+                    entryProvider = entryProvider {
+                        entry(DrawerDestination.BoringScreen) { BoringScreen() }
+                        entry(DrawerDestination.DemoScreen) { DemoScreen() }
+                        entry(DrawerDestination.SimpleScreen) { SimpleScreen() }
+                        entry(DrawerDestination.TextScreen) { TextScreen() }
+                        entry(DrawerDestination.ImageScreen) { ImageScreen() }
+                        entry(DrawerDestination.TimeScreen) { TimeShadersScreen() }
+                        entry(DrawerDestination.PointerScreen) { PointerShadersScreen() }
+                    }
+                )
+            }
         }
     }
 }

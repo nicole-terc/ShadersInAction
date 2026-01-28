@@ -19,7 +19,7 @@ const val RED = """
     uniform shader composable;
     
     half4 main(float2 fragCoord) {
-        half4 color = composable.eval(fragCoord).rgba;
+        half4 color = composable.eval(fragCoord);
         return half4(1.0, color.gba);
     } 
 """
@@ -30,7 +30,7 @@ const val GREEN = """
     uniform shader composable;
     
     half4 main(float2 fragCoord) {
-        half4 color = composable.eval(fragCoord).rgba;
+        half4 color = composable.eval(fragCoord);
         return half4(color.r, 1.0, color.ba);
     }
 """
@@ -41,7 +41,26 @@ const val BLUE = """
     uniform shader composable;
     
     half4 main(float2 fragCoord) {
-        half4 color = composable.eval(fragCoord).rgba;
+        half4 color = composable.eval(fragCoord);
+        return half4(color.rg, 1.0, color.a);
+    }
+"""
+
+@Language("AGSL")
+const val RB_VERTICAL = """
+    uniform float2 size;
+    uniform shader composable;
+    
+    half4 main(float2 fragCoord) {
+       half4 color = composable.eval(fragCoord);
+       float2 uv = fragCoord / size;
+       
+       if(uv.x <= 0.5){
+            // RED tint
+            return half4(1.0, color.gba);
+       }
+       
+        // BLUE tint
         return half4(color.rg, 1.0, color.a);
     }
 """
@@ -52,7 +71,7 @@ const val RGB_VERTICAL = """
     uniform shader composable;
     
     half4 main(float2 fragCoord) {
-       half4 color = composable.eval(fragCoord).rgba;
+       half4 color = composable.eval(fragCoord);
        float2 uv = fragCoord / size;
        
        if(uv.x < 0.33){
@@ -74,7 +93,7 @@ const val RGB_HORIZONTAL = """
     uniform shader composable;
     
     half4 main(float2 fragCoord) {
-       half4 color = composable.eval(fragCoord).rgba;
+       half4 color = composable.eval(fragCoord);
        float2 uv = fragCoord / size;
        
        if(uv.y < 0.33){
@@ -90,6 +109,18 @@ const val RGB_HORIZONTAL = """
     }
 """
 
+@Language("AGSL")
+const val GRAYSCALE = """
+    uniform float2 size;
+    uniform shader composable;
+    
+    half4 main(float2 fragCoord) {
+        half4 base = composable.eval(fragCoord);
+        half average = (base.r + base.g + base.b) / 3.0;
+        return half4(average,average,average, 1.0);
+    }
+"""
+
 // Source: https://www.youtube.com/watch?v=hjJesq71UXc
 @Language("AGSL")
 const val CHROMATIC_ABERRATION = """
@@ -98,7 +129,7 @@ const val CHROMATIC_ABERRATION = """
     uniform float distortion;
 
     half4 main(float2 fragCoord) {
-        half4 color = composable.eval(fragCoord).rgba;
+        half4 color = composable.eval(fragCoord);
         color.r = composable.eval(fragCoord + float2(distortion, 0)).r;
         color.b = composable.eval(fragCoord - float2(distortion, 0)).b;
         return half4(color);
