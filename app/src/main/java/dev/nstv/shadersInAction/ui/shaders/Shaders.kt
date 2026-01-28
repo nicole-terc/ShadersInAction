@@ -67,9 +67,9 @@ object Shaders {
 
     fun getStandaloneShaders() = mapOf(
         "solo white" to solo_white,
-//        "solo red" to solo_red,
-//        "solo green" to solo_green,
-//        "solo blue" to solo_blue,
+        "solo red" to solo_red,
+        "solo green" to solo_green,
+        "solo blue" to solo_blue,
         "solo rb vertical" to solo_rb_vertical,
         "solo rb vertical mix" to solo_rb_vertical_mix,
         "solo rgb vertical" to solo_rgb_vertical,
@@ -111,14 +111,14 @@ object Shaders {
         "flow field 2" to flowField2,
         "fractal" to fractal,
         "liquid warp" to liquidWarp,
-        "balatro warp" to balatroWarp,
+//        "balatro warp" to balatroWarp,
         "balatro warp like" to balatroWarpLike,
         "noise grid" to noiseGrid,
     )
 
     fun getShadersWithPointer() = mapOf(
-        "ripple pointer" to ripplePointer,
         "expansive diffusion" to expansiveDiffusion,
-        "expansive diffusion 2" to expansiveDiffusionTwo,
+//        "expansive diffusion 2" to expansiveDiffusionTwo,
+        "ripple pointer" to ripplePointer,
     )
 }

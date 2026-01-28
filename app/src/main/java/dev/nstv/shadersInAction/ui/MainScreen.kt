@@ -70,7 +70,7 @@ private val shader = RuntimeShader(SHADER_SIX)
 fun MainScreen(
     modifier: Modifier = Modifier,
 ) {
-    val backStack = remember { listOf<Any>(DrawerDestination.BoringScreen).toMutableStateList() }
+    val backStack = remember { listOf<Any>(DrawerDestination.PointerScreen).toMutableStateList() }
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val currentDestination = backStack.lastOrNull() as? DrawerDestination
