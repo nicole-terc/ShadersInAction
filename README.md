@@ -1,6 +1,6 @@
 # Shaders in Action (Android version)!
 
-Code for the talk Shaders in Action, currently only available for Android! :D 
+Code for the talk Shaders in Adnroid! :D
 
 ## Simple Shaders
 
@@ -11,7 +11,6 @@ Code for the talk Shaders in Action, currently only available for Android! :D
 https://github.com/user-attachments/assets/bcddff0b-601e-45ef-9e15-cf1c0bcb8435 
 
 ## Responsive Shaders
-
 
 https://github.com/user-attachments/assets/25a400e5-4606-49f5-8d72-7c963ae16296
 
